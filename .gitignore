@@ -81,6 +81,7 @@ gradle-app.setting
 [._]sw[a-p]
 Session.vim
 .netrwhist
-*~
 tags
 [._]*.un~
+/target
+*.iml

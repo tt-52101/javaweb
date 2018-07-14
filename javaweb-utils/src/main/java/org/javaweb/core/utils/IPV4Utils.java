@@ -64,7 +64,7 @@ public class IPV4Utils {
 	 * @return
 	 */
 	public static String longToIP(long longIp) {
-		StringBuilder sb = new StringBuilder("");
+		StringBuilder sb = new StringBuilder();
 		sb.append(String.valueOf((longIp >>> 24))).append(".");
 		sb.append(String.valueOf((longIp & 0x00FFFFFF) >>> 16)).append(".");
 		sb.append(String.valueOf((longIp & 0x0000FFFF) >>> 8)).append(".");

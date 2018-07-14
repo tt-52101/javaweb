@@ -62,6 +62,7 @@ public class BytesEncodingDetect extends Encoding {
 		int                 result = OTHER;
 		int                 i;
 		sinodetector = new BytesEncodingDetect();
+
 		for (i = 0; i < argc.length; i++) {
 			if (argc[i].startsWith("http://") == true) {
 				try {
@@ -75,6 +76,7 @@ public class BytesEncodingDetect extends Encoding {
 			} else {
 				result = sinodetector.detectEncoding(new File(argc[i]));
 			}
+
 			System.out.println(nicename[result]);
 		}
 	}
@@ -89,18 +91,20 @@ public class BytesEncodingDetect extends Encoding {
 		int         bytesread = 0, byteoffset = 0;
 		int         guess     = OTHER;
 		InputStream chinesestream;
+
 		try {
 			chinesestream = testurl.openStream();
 			while ((bytesread = chinesestream.read(rawtext, byteoffset, rawtext.length - byteoffset)) > 0) {
 				byteoffset += bytesread;
 			}
-			;
+
 			chinesestream.close();
 			guess = detectEncoding(rawtext);
 		} catch (Exception e) {
 			System.err.println("Error loading or using URL " + e.toString());
 			guess = -1;
 		}
+
 		return guess;
 	}
 
@@ -113,6 +117,7 @@ public class BytesEncodingDetect extends Encoding {
 		FileInputStream chinesefile;
 		byte[]          rawtext;
 		rawtext = new byte[(int) testfile.length()];
+
 		try {
 			chinesefile = new FileInputStream(testfile);
 			chinesefile.read(rawtext);
@@ -120,6 +125,7 @@ public class BytesEncodingDetect extends Encoding {
 		} catch (Exception e) {
 			System.err.println("Error: " + e);
 		}
+
 		return detectEncoding(rawtext);
 	}
 
@@ -156,6 +162,7 @@ public class BytesEncodingDetect extends Encoding {
 		scores[ISO2022CN_GB] = 0;
 		scores[ISO2022CN_CNS] = 0;
 		scores[OTHER] = 0;
+
 		// Tabulate Scores
 		for (index = 0; index < TOTALTYPES; index++) {
 			if (debug)
@@ -165,10 +172,12 @@ public class BytesEncodingDetect extends Encoding {
 				maxscore = scores[index];
 			}
 		}
+
 		// Return OTHER if nothing scored above 50
 		if (maxscore <= 50) {
 			encoding_guess = OTHER;
 		}
+
 		return encoding_guess;
 	}
 
@@ -182,20 +191,24 @@ public class BytesEncodingDetect extends Encoding {
 		long  gbfreq        = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Stage 1: Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen - 1; i++) {
 			// System.err.println(rawtext[i]);
 			if (rawtext[i] >= 0) {
 				// asciichars++;
 			} else {
 				dbchars++;
+
 				if ((byte) 0xA1 <= rawtext[i] && rawtext[i] <= (byte) 0xF7 && (byte) 0xA1 <= rawtext[i + 1]
 						&& rawtext[i + 1] <= (byte) 0xFE) {
 					gbchars++;
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
 					column = rawtext[i + 1] + 256 - 0xA1;
+
 					if (GBFreq[row][column] != 0) {
 						gbfreq += GBFreq[row][column];
 					} else if (15 <= row && row < 55) {
@@ -203,11 +216,13 @@ public class BytesEncodingDetect extends Encoding {
 						gbfreq += 200;
 					}
 				}
+
 				i++;
 			}
 		}
 		rangeval = 50 * ((float) gbchars / (float) dbchars);
 		freqval = 50 * ((float) gbfreq / (float) totalfreq);
+
 		return (int) (rangeval + freqval);
 	}
 
@@ -221,8 +236,10 @@ public class BytesEncodingDetect extends Encoding {
 		long  gbfreq        = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Stage 1: Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen - 1; i++) {
 			// System.err.println(rawtext[i]);
 			if (rawtext[i] >= 0) {
@@ -235,6 +252,7 @@ public class BytesEncodingDetect extends Encoding {
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
 					column = rawtext[i + 1] + 256 - 0xA1;
+
 					// System.out.println("original row " + row + " column " + column);
 					if (GBFreq[row][column] != 0) {
 						gbfreq += GBFreq[row][column];
@@ -248,21 +266,25 @@ public class BytesEncodingDetect extends Encoding {
 					gbchars++;
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0x81;
+
 					if (0x40 <= rawtext[i + 1] && rawtext[i + 1] <= 0x7E) {
 						column = rawtext[i + 1] - 0x40;
 					} else {
 						column = rawtext[i + 1] + 256 - 0x40;
 					}
+
 					// System.out.println("extended row " + row + " column " + column + " rawtext[i] " + rawtext[i]);
 					if (GBKFreq[row][column] != 0) {
 						gbfreq += GBKFreq[row][column];
 					}
 				}
+
 				i++;
 			}
 		}
 		rangeval = 50 * ((float) gbchars / (float) dbchars);
 		freqval = 50 * ((float) gbfreq / (float) totalfreq);
+
 		// For regular GB files, this would give the same score, so I handicap it slightly
 		return (int) (rangeval + freqval) - 1;
 	}
@@ -277,20 +299,24 @@ public class BytesEncodingDetect extends Encoding {
 		long  gbfreq        = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Stage 1: Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen - 1; i++) {
 			// System.err.println(rawtext[i]);
 			if (rawtext[i] >= 0) {
 				// asciichars++;
 			} else {
 				dbchars++;
+
 				if ((byte) 0xA1 <= rawtext[i] && rawtext[i] <= (byte) 0xF7 && // Original GB range
 						i + 1 < rawtextlen && (byte) 0xA1 <= rawtext[i + 1] && rawtext[i + 1] <= (byte) 0xFE) {
 					gbchars++;
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
 					column = rawtext[i + 1] + 256 - 0xA1;
+
 					// System.out.println("original row " + row + " column " + column);
 					if (GBFreq[row][column] != 0) {
 						gbfreq += GBFreq[row][column];
@@ -309,6 +335,7 @@ public class BytesEncodingDetect extends Encoding {
 					} else {
 						column = rawtext[i + 1] + 256 - 0x40;
 					}
+
 					// System.out.println("extended row " + row + " column " + column + " rawtext[i] " + rawtext[i]);
 					if (GBKFreq[row][column] != 0) {
 						gbfreq += GBKFreq[row][column];
@@ -326,11 +353,14 @@ public class BytesEncodingDetect extends Encoding {
 					 * column " + column + " rawtext[i] " + rawtext[i]); if (GBKFreq[row][column] != 0) { gbfreq += GBKFreq[row][column]; }
 					 */
 				}
+
 				i++;
 			}
 		}
+
 		rangeval = 50 * ((float) gbchars / (float) dbchars);
 		freqval = 50 * ((float) gbfreq / (float) totalfreq);
+
 		// For regular GB files, this would give the same score, so I handicap it slightly
 		return (int) (rangeval + freqval) - 1;
 	}
@@ -347,11 +377,13 @@ public class BytesEncodingDetect extends Encoding {
 		int   hzstart  = 0, hzend = 0;
 		int   row, column;
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen; i++) {
 			if (rawtext[i] == '~') {
 				if (rawtext[i + 1] == '{') {
 					hzstart++;
 					i += 2;
+
 					while (i < rawtextlen - 1) {
 						if (rawtext[i] == 0x0A || rawtext[i] == 0x0D) {
 							break;
@@ -380,6 +412,7 @@ public class BytesEncodingDetect extends Encoding {
 								hzfreq += 200;
 							}
 						}
+
 						dbchars += 2;
 						i += 2;
 					}
@@ -391,6 +424,7 @@ public class BytesEncodingDetect extends Encoding {
 				}
 			}
 		}
+
 		if (hzstart > 4) {
 			rangeval = 50;
 		} else if (hzstart > 1) {
@@ -400,6 +434,7 @@ public class BytesEncodingDetect extends Encoding {
 		} else {
 			rangeval = 0;
 		}
+
 		freqval = 50 * ((float) hzfreq / (float) totalfreq);
 		return (int) (rangeval + freqval);
 	}
@@ -414,8 +449,10 @@ public class BytesEncodingDetect extends Encoding {
 		float rangeval      = 0, freqval = 0;
 		long  bffreq        = 0, totalfreq = 1;
 		int   row, column;
+
 		// Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen - 1; i++) {
 			if (rawtext[i] >= 0) {
 				// asciichars++;
@@ -427,22 +464,27 @@ public class BytesEncodingDetect extends Encoding {
 					bfchars++;
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
+
 					if (0x40 <= rawtext[i + 1] && rawtext[i + 1] <= 0x7E) {
 						column = rawtext[i + 1] - 0x40;
 					} else {
 						column = rawtext[i + 1] + 256 - 0x61;
 					}
+
 					if (Big5Freq[row][column] != 0) {
 						bffreq += Big5Freq[row][column];
 					} else if (3 <= row && row <= 37) {
 						bffreq += 200;
 					}
 				}
+
 				i++;
 			}
 		}
+
 		rangeval = 50 * ((float) bfchars / (float) dbchars);
 		freqval = 50 * ((float) bffreq / (float) totalfreq);
+
 		return (int) (rangeval + freqval);
 	}
 
@@ -456,6 +498,7 @@ public class BytesEncodingDetect extends Encoding {
 		long  bffreq        = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Stage 1: Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
 		for (i = 0; i < rawtextlen - 1; i++) {
@@ -469,11 +512,13 @@ public class BytesEncodingDetect extends Encoding {
 					bfchars++;
 					totalfreq += 500;
 					row = rawtext[i] - 0xA1;
+
 					if (0x40 <= rawtext[i + 1] && rawtext[i + 1] <= 0x7E) {
 						column = rawtext[i + 1] - 0x40;
 					} else {
 						column = rawtext[i + 1] - 0x61;
 					}
+
 					// System.out.println("original row " + row + " column " + column);
 					if (Big5Freq[row][column] != 0) {
 						bffreq += Big5Freq[row][column];
@@ -485,6 +530,7 @@ public class BytesEncodingDetect extends Encoding {
 					bfchars++;
 					totalfreq += 500;
 					row = rawtext[i] - 0x81;
+
 					if (0x40 <= rawtext[i + 1] && rawtext[i + 1] <= 0x7E) {
 						column = rawtext[i + 1] - 0x40;
 					} else {
@@ -495,11 +541,14 @@ public class BytesEncodingDetect extends Encoding {
 						bffreq += Big5PFreq[row][column];
 					}
 				}
+
 				i++;
 			}
 		}
+
 		rangeval = 50 * ((float) bfchars / (float) dbchars);
 		freqval = 50 * ((float) bffreq / (float) totalfreq);
+
 		// For regular Big5 files, this would give the same score, so I handicap it slightly
 		return (int) (rangeval + freqval) - 1;
 	}
@@ -514,6 +563,7 @@ public class BytesEncodingDetect extends Encoding {
 		long  cnsfreq       = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Check to see if characters fit into acceptable ranges
 		// and have expected frequency of use
 		rawtextlen = rawtext.length;
@@ -535,15 +585,18 @@ public class BytesEncodingDetect extends Encoding {
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
 					column = rawtext[i + 1] + 256 - 0xA1;
+
 					if (EUC_TWFreq[row][column] != 0) {
 						cnsfreq += EUC_TWFreq[row][column];
 					} else if (35 <= row && row <= 92) {
 						cnsfreq += 150;
 					}
+
 					i++;
 				}
 			}
 		}
+
 		rangeval = 50 * ((float) cnschars / (float) dbchars);
 		freqval = 50 * ((float) cnsfreq / (float) totalfreq);
 		return (int) (rangeval + freqval);
@@ -559,6 +612,7 @@ public class BytesEncodingDetect extends Encoding {
 		long  isofreq       = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Check to see if characters fit into acceptable ranges
 		// and have expected frequency of use
 		rawtextlen = rawtext.length;
@@ -568,18 +622,22 @@ public class BytesEncodingDetect extends Encoding {
 					i += 4;
 					while (rawtext[i] != (byte) 0x1B) {
 						dbchars++;
+
 						if ((0x21 <= rawtext[i] && rawtext[i] <= 0x77) && (0x21 <= rawtext[i + 1] && rawtext[i + 1] <= 0x77)) {
 							isochars++;
 							row = rawtext[i] - 0x21;
 							column = rawtext[i + 1] - 0x21;
 							totalfreq += 500;
+
 							if (GBFreq[row][column] != 0) {
 								isofreq += GBFreq[row][column];
 							} else if (15 <= row && row < 55) {
 								isofreq += 200;
 							}
+
 							i++;
 						}
+
 						i++;
 					}
 				} else if (i + 3 < rawtextlen && rawtext[i + 1] == (byte) 0x24 && rawtext[i + 2] == (byte) 0x29
@@ -599,11 +657,14 @@ public class BytesEncodingDetect extends Encoding {
 							} else if (35 <= row && row <= 92) {
 								isofreq += 150;
 							}
+
 							i++;
 						}
+
 						i++;
 					}
 				}
+
 				if (rawtext[i] == (byte) 0x1B && i + 2 < rawtextlen && rawtext[i + 1] == (byte) 0x28 && rawtext[i + 2] == (byte) 0x42) { // ASCII:
 					// ESC
 					// ( B
@@ -630,6 +691,7 @@ public class BytesEncodingDetect extends Encoding {
 		// Maybe also use UTF8 Byte Order Mark: EF BB BF
 		// Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen; i++) {
 			if ((rawtext[i] & (byte) 0x7F) == rawtext[i]) { // One byte
 				asciibytes++;
@@ -646,10 +708,13 @@ public class BytesEncodingDetect extends Encoding {
 				i += 2;
 			}
 		}
+
 		if (asciibytes == rawtextlen) {
 			return 0;
 		}
+
 		score = (int) (100 * ((float) goodbytes / (float) (rawtextlen - asciibytes)));
+
 		// System.out.println("rawtextlen " + rawtextlen + " goodbytes " + goodbytes + " asciibytes " + asciibytes + " score " +
 		// score);
 		// If not above 98, reduce to zero to prevent coincidental matches
@@ -675,6 +740,7 @@ public class BytesEncodingDetect extends Encoding {
 				((byte) 0xFF == rawtext[0] && (byte) 0xFE == rawtext[1])) { // Little-endian
 			return 100;
 		}
+
 		return 0;
 		/**
 		 * // Check to see if characters fit into acceptable ranges rawtextlen = rawtext.length; for (i = 0; i < rawtextlen; i++) {
@@ -697,16 +763,19 @@ public class BytesEncodingDetect extends Encoding {
 		int score = 75;
 		int i, rawtextlen;
 		rawtextlen = rawtext.length;
+
 		for (i = 0; i < rawtextlen; i++) {
 			if (rawtext[i] < 0) {
 				score = score - 5;
 			} else if (rawtext[i] == (byte) 0x1B) { // ESC (used by ISO 2022)
 				score = score - 5;
 			}
+
 			if (score <= 0) {
 				return 0;
 			}
 		}
+
 		return score;
 	}
 
@@ -734,15 +803,18 @@ public class BytesEncodingDetect extends Encoding {
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
 					column = rawtext[i + 1] + 256 - 0xA1;
+
 					if (KRFreq[row][column] != 0) {
 						krfreq += KRFreq[row][column];
 					} else if (15 <= row && row < 55) {
 						krfreq += 0;
 					}
 				}
+
 				i++;
 			}
 		}
+
 		rangeval = 50 * ((float) krchars / (float) dbchars);
 		freqval = 50 * ((float) krfreq / (float) totalfreq);
 		return (int) (rangeval + freqval);
@@ -758,6 +830,7 @@ public class BytesEncodingDetect extends Encoding {
 		long  krfreq        = 0, totalfreq = 1;
 		float rangeval      = 0, freqval = 0;
 		int   row, column;
+
 		// Stage 1: Check to see if characters fit into acceptable ranges
 		rawtextlen = rawtext.length;
 		for (i = 0; i < rawtextlen - 1; i++) {
@@ -772,18 +845,22 @@ public class BytesEncodingDetect extends Encoding {
 						&& rawtext[i + 1] <= (byte) 0x7A || (byte) 0x81 <= rawtext[i + 1] && rawtext[i + 1] <= (byte) 0xFE)) {
 					krchars++;
 					totalfreq += 500;
+
 					if ((byte) 0xA1 <= rawtext[i] && rawtext[i] <= (byte) 0xFE && (byte) 0xA1 <= rawtext[i + 1]
 							&& rawtext[i + 1] <= (byte) 0xFE) {
 						row = rawtext[i] + 256 - 0xA1;
 						column = rawtext[i + 1] + 256 - 0xA1;
+
 						if (KRFreq[row][column] != 0) {
 							krfreq += KRFreq[row][column];
 						}
 					}
 				}
+
 				i++;
 			}
 		}
+
 		rangeval = 50 * ((float) krchars / (float) dbchars);
 		freqval = 50 * ((float) krfreq / (float) totalfreq);
 		return (int) (rangeval + freqval);
@@ -797,6 +874,7 @@ public class BytesEncodingDetect extends Encoding {
 				return 100;
 			}
 		}
+
 		return 0;
 	}
 
@@ -824,12 +902,14 @@ public class BytesEncodingDetect extends Encoding {
 					totalfreq += 500;
 					row = rawtext[i] + 256 - 0xA1;
 					column = rawtext[i + 1] + 256 - 0xA1;
+
 					if (JPFreq[row][column] != 0) {
 						jpfreq += JPFreq[row][column];
 					} else if (15 <= row && row < 55) {
 						jpfreq += 0;
 					}
 				}
+
 				i++;
 			}
 		}
@@ -845,6 +925,7 @@ public class BytesEncodingDetect extends Encoding {
 				return 100;
 			}
 		}
+
 		return 0;
 	}
 
@@ -873,6 +954,7 @@ public class BytesEncodingDetect extends Encoding {
 					totalfreq += 500;
 					row = rawtext[i] + 256;
 					column = rawtext[i + 1] + 256;
+
 					if (column < 0x9f) {
 						adjust = 1;
 						if (column > 0x7f) {
@@ -884,17 +966,20 @@ public class BytesEncodingDetect extends Encoding {
 						adjust = 0;
 						column -= 0x7e;
 					}
+
 					if (row < 0xa0) {
 						row = ((row - 0x70) << 1) - adjust;
 					} else {
 						row = ((row - 0xb0) << 1) - adjust;
 					}
+
 					row -= 0x20;
 					column = 0x20;
 					// System.out.println("original row " + row + " column " + column);
 					if (row < JPFreq.length && column < JPFreq[row].length && JPFreq[row][column] != 0) {
 						jpfreq += JPFreq[row][column];
 					}
+
 					i++;
 				} else if ((byte) 0xA1 <= rawtext[i] && rawtext[i] <= (byte) 0xDF) {
 					// half-width katakana, convert to full-width

@@ -102,10 +102,9 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
 	 *
 	 * @param data
 	 * @return
-	 * @throws IOException
 	 * @throws DataFormatException
 	 */
-	public static byte[] decompressInflater(byte[] data) throws IOException, DataFormatException {
+	public static byte[] decompressInflater(byte[] data) throws DataFormatException {
 		Inflater inflater = new Inflater();
 		inflater.setInput(data);
 		ByteArrayOutputStream out    = new ByteArrayOutputStream(data.length);

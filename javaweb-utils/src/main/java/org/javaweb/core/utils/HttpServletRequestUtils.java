@@ -333,9 +333,8 @@ public class HttpServletRequestUtils {
 
 			// 文件后缀验证
 			String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-			if (Pattern.compile("asp|asa|cer|jsp|php", Pattern.CASE_INSENSITIVE | Pattern.DOTALL).matcher(fileExt).find()) {
-				return false;
-			}
+
+			return !Pattern.compile("asp|asa|cer|jsp|php", Pattern.CASE_INSENSITIVE | Pattern.DOTALL).matcher(fileExt).find();
 		}
 
 		return true;

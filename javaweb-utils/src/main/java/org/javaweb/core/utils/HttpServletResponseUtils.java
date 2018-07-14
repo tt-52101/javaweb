@@ -60,7 +60,7 @@ public class HttpServletResponseUtils {
 		download(response, file, null);
 	}
 
-	public static void download(HttpServletResponse response, File file, String fileName) throws IOException {
+	public static void download(HttpServletResponse response, File file, String fileName) {
 		FileInputStream in = null;
 
 		try {
@@ -129,9 +129,8 @@ public class HttpServletResponseUtils {
 	 * @param response
 	 * @param contentType
 	 * @param in
-	 * @throws IOException
 	 */
-	public static void response(HttpServletResponse response, String contentType, InputStream in) throws IOException {
+	public static void response(HttpServletResponse response, String contentType, InputStream in) {
 		try {
 			response.setContentType(contentType);
 			OutputStream out   = response.getOutputStream();

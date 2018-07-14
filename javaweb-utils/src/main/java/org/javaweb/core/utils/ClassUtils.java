@@ -139,10 +139,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
 	}
 
 	private static boolean shouldComputeFrames(ClassReader cr) {
-		if (getClassVersion(cr) < 50) {
-			return false;
-		}
-		return true;
+		return getClassVersion(cr) >= 50;
 	}
 
 	public static ClassWriter getClassWriter(ClassReader cr, ClassLoader classLoader) {

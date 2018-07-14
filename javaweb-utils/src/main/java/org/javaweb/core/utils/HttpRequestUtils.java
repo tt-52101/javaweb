@@ -400,11 +400,9 @@ public class HttpRequestUtils {
 	public static boolean isHost(String url) {
 		String strRegexIp     = "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}$";
 		String strRegexDomain = "^(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2}).(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2}).(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2}).(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2})$";
-		if (Pattern.compile(strRegexIp, Pattern.CASE_INSENSITIVE).matcher(url).find() ||
-				Pattern.compile(strRegexDomain, Pattern.CASE_INSENSITIVE).matcher(url).find()) {
-			return true;
-		}
-		return false;
+
+		return Pattern.compile(strRegexIp, Pattern.CASE_INSENSITIVE).matcher(url).find() ||
+				Pattern.compile(strRegexDomain, Pattern.CASE_INSENSITIVE).matcher(url).find();
 	}
 
 }

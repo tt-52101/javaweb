@@ -62,7 +62,7 @@ public class MultipartRequest extends HttpRequest {
 		}
 	}
 
-	public static void main(String[] args) throws MalformedURLException {
+	public static void main(String[] args) {
 		try {
 			// 设置请求的表单域,可以直接.data(k,v),也可以这样批量set
 			Map<String, String> data = new LinkedHashMap<String, String>();

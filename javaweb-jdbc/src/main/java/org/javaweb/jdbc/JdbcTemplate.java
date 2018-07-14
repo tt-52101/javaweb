@@ -115,7 +115,7 @@ public class JdbcTemplate {
 					id = findId(tableName, fieldMap);
 				}
 
-				Object       idValue = methodMap.get("get" + table.id()).invoke(obj, new Object[]{});
+				Object       idValue = methodMap.get("get" + table.id()).invoke(obj);
 				List<Object> ls      = new ArrayList<Object>();
 
 				if (StringUtils.isNotEmpty(idValue)) {
@@ -142,7 +142,7 @@ public class JdbcTemplate {
 						if (updatable) {
 							Method getMethod = methodMap.get("get" + str);
 							sqlBuilder.append(", ").append(columnName).append("=").append("?");
-							ls.add(getMethod.invoke(obj, new Object[]{}));
+							ls.add(getMethod.invoke(obj));
 						}
 					}
 				}

@@ -152,11 +152,10 @@ public class DirectiveUtils {
 	 * @param env
 	 * @param params
 	 * @param origMap
-	 * @throws TemplateException
 	 */
 	public static void removeParamsFromVariable(
 			Environment env, Map<String, TemplateModel> params,
-			Map<String, TemplateModel> origMap) throws TemplateException {
+			Map<String, TemplateModel> origMap) {
 
 		if (!params.isEmpty()) {
 			for (String key : params.keySet()) {
@@ -290,9 +289,9 @@ public class DirectiveUtils {
 
 							// 不处理空值
 							if (StringUtils.isNotEmpty(valueStr)) {
-								if (StringUtils.isNum(valueStr.toString())) {
+								if (StringUtils.isNum(valueStr)) {
 									try {
-										Number number = NumberFormat.getInstance().parse(valueStr.toString());
+										Number number = NumberFormat.getInstance().parse(valueStr);
 
 										if (className.equals("java.lang.Integer") || className.equals("int")) {
 											method.invoke(instance, number.intValue());
@@ -316,9 +315,9 @@ public class DirectiveUtils {
 									}
 								} else {
 									if (className.equals("java.lang.Boolean") || className.equals("boolean")) {
-										method.invoke(instance, "true".equalsIgnoreCase(valueStr.toString()));
+										method.invoke(instance, "true".equalsIgnoreCase(valueStr));
 									} else if (className.equals("java.lang.Char") || className.equals("char")) {
-										method.invoke(instance, valueStr.toString().charAt(0));
+										method.invoke(instance, valueStr.charAt(0));
 									} else if (className.equals("java.lang.String")) {
 										method.invoke(instance, valueStr);
 									} else if (className.equals("java.lang.StringBuffer")) {

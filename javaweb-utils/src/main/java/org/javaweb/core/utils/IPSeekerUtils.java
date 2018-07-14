@@ -182,7 +182,7 @@ public class IPSeekerUtils {
 
 		// 先检查cache中是否已经包含有这个ip的结果，没有再搜索文件
 		if (ipCache.containsKey(ipStr)) {
-			IPLocation loc = (IPLocation) ipCache.get(ipStr);
+			IPLocation loc = ipCache.get(ipStr);
 			return loc.country;
 		} else {
 			IPLocation loc = getIPLocation(ip);
@@ -270,7 +270,7 @@ public class IPSeekerUtils {
 
 		// 先检查cache中是否已经包含有这个ip的结果，没有再搜索文件
 		if (ipCache.containsKey(ipStr)) {
-			IPLocation loc = (IPLocation) ipCache.get(ipStr);
+			IPLocation loc = ipCache.get(ipStr);
 			return loc.area;
 		} else {
 			IPLocation loc = getIPLocation(ip);

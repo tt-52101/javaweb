@@ -62,9 +62,8 @@ public class ImageUtils {
 	 *
 	 * @param file
 	 * @return
-	 * @throws IOException
 	 */
-	public static boolean isImage(File file) throws IOException {
+	public static boolean isImage(File file) {
 		try {
 			ImageInfo info = new ImageInfo(file);
 			return info.getWidth() > 0 || info.getHeight() > 0;
@@ -78,9 +77,8 @@ public class ImageUtils {
 	 *
 	 * @param bytes
 	 * @return
-	 * @throws IOException
 	 */
-	public static boolean isImage(byte[] bytes) throws IOException {
+	public static boolean isImage(byte[] bytes) {
 		try {
 			ImageInfo info = new ImageInfo(bytes);
 			return info.getWidth() > 0 || info.getHeight() > 0;
@@ -94,9 +92,8 @@ public class ImageUtils {
 	 *
 	 * @param in
 	 * @return
-	 * @throws IOException
 	 */
-	public static boolean isImage(InputStream in) throws IOException {
+	public static boolean isImage(InputStream in) {
 		try {
 			ImageInfo info = new ImageInfo(in);
 			return info.getWidth() > 0 || info.getHeight() > 0;

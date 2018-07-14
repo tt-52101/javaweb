@@ -48,7 +48,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
 	 * @return
 	 */
 	public static boolean isNum(String str) {
-		return isNotEmpty(str) ? str.trim().replaceAll("[0-9]+", "").length() == 0 : false;
+		return isNotEmpty(str) && str.trim().replaceAll("[0-9]+", "").length() == 0;
 	}
 
 	/**

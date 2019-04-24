@@ -50,7 +50,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
 
 			// 查找所有的class文件
 			if (fileString.endsWith(".class")) {
-				String classPath = fileString.substring(path.length(), fileString.length());
+				String classPath = fileString.substring(path.length());
 				classPath = classPath.replaceAll("\\\\+", "/").replaceAll("/+", "/").replaceAll("^/", "");
 				ls.add(classPath.substring(0, classPath.length() - ".class".length()));
 			}

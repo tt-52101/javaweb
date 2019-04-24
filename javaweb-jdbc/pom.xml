@@ -6,11 +6,12 @@
     <parent>
         <artifactId>javaweb</artifactId>
         <groupId>org.javaweb</groupId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>javaweb-jdbc</artifactId>
+    <version>${parent.version}</version>
 
     <properties>
         <junit>4.12</junit>
@@ -25,7 +26,7 @@
         <dependency>
             <groupId>org.javaweb</groupId>
             <artifactId>javaweb-utils</artifactId>
-            <version>1.1.0</version>
+            <version>${parent.version}</version>
         </dependency>
 
     </dependencies>

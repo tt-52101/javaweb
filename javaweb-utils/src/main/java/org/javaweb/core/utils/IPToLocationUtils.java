@@ -29,7 +29,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * IP地址转换成地理位置工具类，使用前如果IP数据文件未初始化的情况下就必须要先调用一次load方法加载数据文件
+ * IP地址转换成地理位置工具类，使用得IPIP.NET免费版IP数据库。使用前如果IP数据文件未初始化的
+ * 情况下就必须要先调用一次load方法加载数据文件
  *
  * @author yz
  */

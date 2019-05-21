@@ -50,7 +50,7 @@ public class HttpRequestUtils {
 		String path = "".equals(url.getPath()) ? "/" : url.getPath();
 		String file = path.substring(path.lastIndexOf("/"));
 
-		return file.substring(file.lastIndexOf(".") + 1, file.length());
+		return file.substring(file.lastIndexOf(".") + 1);
 	}
 
 	/**
@@ -71,6 +71,7 @@ public class HttpRequestUtils {
 					if (i > 0) {
 						sb.append("&");
 					}
+
 					i++;
 					sb.append(a).append("=").append(URLEncoder.encode(args.get(a), encoding));
 				} catch (UnsupportedEncodingException e) {

@@ -32,7 +32,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	 * @return
 	 */
 	public static String getFileSuffix(String str) {
-		return str.substring(str.lastIndexOf(".") + 1, str.length());
+		return str.substring(str.lastIndexOf(".") + 1);
 	}
 
 	/**

@@ -19,6 +19,8 @@ import java.util.Arrays;
  */
 public class IPLocationUtils {
 
+	private static final Logger LOG = LoggerFactory.getLogger(IPToLocationUtils.class);
+
 	private static int nodeCount;
 
 	private static byte[] data;
@@ -32,8 +34,6 @@ public class IPLocationUtils {
 	private static int fileSize;
 
 	private static String ipFileName = "mydata4vipday2.ipdb";
-
-	private static final Logger LOG = LoggerFactory.getLogger(IPToLocationUtils.class);
 
 	private static File ipFile = new File(FileUtils.getCurrentDirectory(), ipFileName);
 

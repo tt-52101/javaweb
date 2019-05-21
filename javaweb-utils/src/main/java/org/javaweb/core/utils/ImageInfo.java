@@ -110,9 +110,9 @@ public class ImageInfo {
 				entries = readInt(is, 2, bigEndian);
 
 				for (int i = 1; i <= entries; i++) {
-					int  tag       = readInt(is, 2, bigEndian);
-					int  fieldType = readInt(is, 2, bigEndian);
-					int  valOffset;
+					int tag       = readInt(is, 2, bigEndian);
+					int fieldType = readInt(is, 2, bigEndian);
+					int valOffset;
 
 					if (fieldType == 3 || fieldType == 8) {
 						valOffset = readInt(is, 2, bigEndian);

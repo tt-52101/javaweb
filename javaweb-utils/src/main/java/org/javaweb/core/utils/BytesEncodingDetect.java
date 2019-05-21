@@ -29,19 +29,19 @@ public class BytesEncodingDetect extends Encoding {
 
 	// Frequency tables to hold the GB, Big5, and EUC-TW character
 	// frequencies
-	int GBFreq[][];
+	int[][] GBFreq;
 
-	int GBKFreq[][];
+	int[][] GBKFreq;
 
-	int Big5Freq[][];
+	int[][] Big5Freq;
 
-	int Big5PFreq[][];
+	int[][] Big5PFreq;
 
-	int EUC_TWFreq[][];
+	int[][] EUC_TWFreq;
 
-	int KRFreq[][];
+	int[][] KRFreq;
 
-	int JPFreq[][];
+	int[][] JPFreq;
 
 	public BytesEncodingDetect() {
 		super();
@@ -57,7 +57,7 @@ public class BytesEncodingDetect extends Encoding {
 		initialize_frequencies();
 	}
 
-	public static void main(String argc[]) {
+	public static void main(String[] argc) {
 		BytesEncodingDetect sinodetector;
 		int                 result = OTHER;
 		int                 i;

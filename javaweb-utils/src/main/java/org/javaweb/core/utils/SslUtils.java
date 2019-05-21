@@ -16,7 +16,6 @@
 package org.javaweb.core.utils;
 
 import javax.net.ssl.*;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class SslUtils {

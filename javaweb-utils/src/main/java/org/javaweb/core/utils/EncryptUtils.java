@@ -24,7 +24,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -177,9 +177,7 @@ public class EncryptUtils {
 	 */
 	public static byte[] encryptionRC4Byte(String data, String key) {
 		try {
-			return encryptionRC4Byte(data.getBytes("UTF-8"), key);
-		} catch (UnsupportedEncodingException e) {
-			return null;
+			return encryptionRC4Byte(data.getBytes(StandardCharsets.UTF_8), key);
 		} catch (NullPointerException e) {
 			return null;
 		}
@@ -210,13 +208,9 @@ public class EncryptUtils {
 		private static byte[] initKey(String key) {
 			byte[] bytes = null;
 
-			try {
-				bytes = key.getBytes("UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// 忽略
-			}
+			bytes = key.getBytes(StandardCharsets.UTF_8);
 
-			byte state[] = new byte[256];
+			byte[] state = new byte[256];
 
 			for (int i = 0; i < 256; i++) {
 				state[i] = (byte) i;

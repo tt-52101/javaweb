@@ -21,6 +21,7 @@ import org.apache.commons.codec.binary.Base64;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class HttpServletResponseUtils {
 
@@ -41,11 +42,11 @@ public class HttpServletResponseUtils {
 	}
 
 	public static void responseRc4Json(HttpServletResponse response, Object obj, String RC4Key) {
-		try {
-			response(response, "application/json;charset=UTF-8", new String(Base64.encodeBase64(EncryptUtils.encryptionRC4Byte(JSON.toJSONString(obj), RC4Key)), "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		response(response, "application/json;charset=UTF-8",
+				new String(Base64.encodeBase64(
+						EncryptUtils.encryptionRC4Byte(JSON.toJSONString(obj), RC4Key)
+				), StandardCharsets.UTF_8)
+		);
 	}
 
 	public static void responseHTML(HttpServletResponse response, String text) {
@@ -83,7 +84,9 @@ public class HttpServletResponseUtils {
 					response.setContentType(info.getMimeType());
 				} else {
 					response.setContentType("application/octet-stream");
-					response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+					response.addHeader("Content-Disposition", "attachment;filename=" +
+							URLEncoder.encode(fileName, "UTF-8")
+					);
 				}
 
 				in = new FileInputStream(file);

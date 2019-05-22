@@ -15,7 +15,6 @@
  */
 package org.javaweb.core.net;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.javaweb.core.utils.IOUtils;
 import org.javaweb.core.utils.StringUtils;
@@ -76,6 +75,8 @@ public class HttpResponseParser {
 	 */
 	private InputStream httpBodyInputStream;
 
+	private static Pattern responsePattern = Pattern.compile("^(HTTP/\\d\\.\\d) (\\d{3}) (.*)$");
+
 	public HttpResponseParser(InputStream in) {
 		this.dis = new DataInputStream(in);
 		parse();
@@ -88,19 +89,6 @@ public class HttpResponseParser {
 	 */
 	public static int getMaxHeaderLength() {
 		return MAX_HEADER_LENGTH;
-	}
-
-	public static void main(String[] args) {
-		String             base64         = "SFRUUC8xLjEgMjAwIE9LDQpEYXRlOiBXZWQsIDA5IE5vdiAyMDE2IDE1OjAwOjAxIEdNVA0KVmFyeTogQWNjZXB0LUVuY29kaW5nDQpDb250ZW50LVR5cGU6IHRleHQvaHRtbA0KU2VydmVyOiBBcGFjaGUNCkNvbnRlbnQtRW5jb2Rpbmc6IGd6aXANClRyYW5zZmVyLUVuY29kaW5nOiBjaHVua2VkDQpDb25uZWN0aW9uOiBjbG9zZQ0KU2V0LUNvb2tpZTogVDEtSXBsV2ViLVN0YXRzYmJiYmJiYmJiYmJiYmJiYj1FRENMRE5MT0FDS0pNR0lDRVBNT0ZHTUVIQU9DTEZFSEhHREVFTlBJSENNUEJDQk1PT0xLSkhQTEZQRUtFT0tETkxMRElCRElHSkJISkJDRERNT0FQSE9HS0RMSERPSUZBRVBGQ09OSkJLSUNNSkhCTUZLRk5LQUNLRk5PREhIRzsgSHR0cE9ubHkNCg0KMjQNCh+LCAAAAAAAAAPzLy1R8E9TCE4tKstMTlVUBAAmA4HKEAAAAA0KMA0KDQo=";
-		HttpResponseParser responseParser = new HttpResponseParser(new ByteArrayInputStream(Base64.decodeBase64(base64)));
-		InputStream        in             = responseParser.getHttpBodyInputStream();
-
-		try {
-			String str = IOUtils.toString(in, "UTF-8");
-			System.out.println(str);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -258,7 +246,7 @@ public class HttpResponseParser {
 				String       responseStatusLine = new BufferedReader(sr).readLine();
 
 				if (StringUtils.isNotEmpty(responseStatusLine)) {
-					Matcher m = Pattern.compile("^(HTTP/\\d\\.\\d) (\\d{3}) (.*)$").matcher(responseStatusLine);
+					Matcher m = responsePattern.matcher(responseStatusLine);
 
 					if (m.find() && m.groupCount() == 3) {
 						this.httpVersion = m.group(1);
@@ -278,7 +266,6 @@ public class HttpResponseParser {
 	 * @throws IOException
 	 */
 	private void parseHttpResponseBodyInputStream() throws IOException {
-
 		InputStream bodyInputStream = null;
 
 		// 解析chunked
@@ -296,8 +283,7 @@ public class HttpResponseParser {
 
 		// 解析gzip和deflate
 		if (this.headerMap.containsKey("Content-Encoding")) {
-			String contentEncoding = (String) this.headerMap.get("Content-Encoding");
-
+			String      contentEncoding     = (String) this.headerMap.get("Content-Encoding");
 			InputStream compressInputStream = null;
 
 			try {

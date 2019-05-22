@@ -15,13 +15,11 @@
  */
 package org.javaweb.core.net;
 
-import org.apache.commons.codec.binary.Base64;
 import org.javaweb.core.utils.HttpRequestUtils;
 import org.javaweb.core.utils.IOUtils;
 import org.javaweb.core.utils.SslUtils;
 import org.javaweb.core.utils.StringUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +27,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -59,33 +56,6 @@ public class MultipartRequest extends HttpRequest {
 			throw new MalformedURLException("只支持 http & https 请求协议.");
 		} else if ("https".equalsIgnoreCase(protocol)) {
 			SslUtils.ignoreSsl();
-		}
-	}
-
-	public static void main(String[] args) {
-		try {
-			// 设置请求的表单域,可以直接.data(k,v),也可以这样批量set
-			Map<String, String> data = new LinkedHashMap<String, String>();
-			data.put("action", "queryDetail");
-			data.put("wzlb", "DCFS");
-			data.put("noticeId", "356-1 and 1<ascii(substr(user, 1, 1))");
-			data.put("showwzlb", "");
-
-			String url = "http://javaweb.org/1.php?XDEBUG_SESSION_START=11391";
-
-			// 设置需要传入的流,可以是FileInputStream或者二进制流(ByteArrayInputStream)，只要是InputStream就行。
-			// MultipartFileField 中的第一个参数是表单域名称,如果不传值默认是"file",尽量记得设置这个值
-			Set<MultipartFileField> fileFields = new LinkedHashSet<MultipartFileField>();
-			MultipartFileField      field1     = new MultipartFileField("1.html", new FileInputStream("/Users/yz/1.html"));
-			MultipartFileField      field2     = new MultipartFileField("file2", "2.txt", new FileInputStream("/Users/yz/2.txt"));
-			fileFields.add(field1);
-			fileFields.add(field2);
-
-			HttpResponse response = new MultipartRequest(url).data(data).files(fileFields).request();
-			System.out.println(response.body());
-			System.out.println(response.getExceptionName());
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -213,7 +183,11 @@ public class MultipartRequest extends HttpRequest {
 						field.setContentType(HttpURLConnection.guessContentTypeFromName(field.getFileName()));
 					}
 
-					out.write(("Content-Disposition: form-data; name=\"" + field.getFieldName() + "\"; filename=\"" + field.getFileName() + "\"" + LINE_FEED).getBytes(charset));
+					out.write(
+							("Content-Disposition: form-data; name=\"" + field.getFieldName() + "\"; "
+									+ "filename=\"" + field.getFileName() + "\"" + LINE_FEED).getBytes(charset)
+					);
+
 					out.write(("Content-Type: " + field.getContentType() + LINE_FEED).getBytes());
 					out.write(("Content-Transfer-Encoding: binary" + LINE_FEED).getBytes());
 					out.write(LINE_FEED.getBytes());
@@ -278,8 +252,8 @@ public class MultipartRequest extends HttpRequest {
 
 				OutputStream out = httpURLConnection.getOutputStream();
 
-				setRequestFormData(out);// 设置form表单域参数
-				httpURLConnection.connect();// 建立http连接
+				setRequestFormData(out);// 设置Form表单域参数
+				httpURLConnection.connect();// 建立HTTP连接
 				setResponse(httpURLConnection, response);// 设置HTTP响应信息
 
 				// 获取HTTP请求响应内容
@@ -290,13 +264,13 @@ public class MultipartRequest extends HttpRequest {
 				}
 
 				if (in != null) {
-					response.setBase64Data(Base64.encodeBase64String(IOUtils.inputStreamToByteArray(in)));
+					response.setBodyBytes(IOUtils.toByteArray(in));
 				}
 			} catch (UnknownHostException e) {
-				response.setExceptionName(e.toString());
+				response.setException(e);
 			}
 		} catch (IOException e) {
-			response.setExceptionName(e.toString());
+			response.setException(e);
 		} finally {
 			IOUtils.closeQuietly(in);
 

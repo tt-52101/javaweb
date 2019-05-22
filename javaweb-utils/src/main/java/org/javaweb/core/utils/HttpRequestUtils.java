@@ -15,7 +15,6 @@
  */
 package org.javaweb.core.utils;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.javaweb.core.net.HttpRequest;
 import org.javaweb.core.net.HttpResponse;
@@ -191,14 +190,22 @@ public class HttpRequestUtils {
 
 		// 设置HTTP非GET请求参数
 		if (StringUtils.isNotEmpty(request.getMethod()) && !"GET".equalsIgnoreCase(request.getMethod())) {
-			if (StringUtils.isNotEmpty(data) || StringUtils.isNotEmpty(request.getRequestBae64InputStream())) {
+			if (data != null || request.getRequestBytes() != null || request.getRequestInputStream() != null) {
 				OutputStream out = httpURLConnection.getOutputStream();
 
-				// 如果有设置HTTP请求的InputStream则忽略data
-				if (StringUtils.isNotEmpty(request.getRequestBae64InputStream())) {
-					out.write(Base64.decodeBase64(request.getRequestBae64InputStream()));
+				// 输出请求数据,优先级:byte[]->InputStream->String
+				if (request.getRequestBytes() != null) {
+					out.write(request.getRequestBytes());
+				} else if (request.getRequestInputStream() != null) {
+					InputStream in    = request.getRequestInputStream();
+					byte[]      bytes = new byte[2048];
+					int         a     = 0;
+
+					while ((a = in.read(bytes)) != -1) {
+						out.write(bytes, 0, a);
+					}
 				} else {
-					out.write(data.getBytes());
+					out.write(data.getBytes(request.getCharset()));
 				}
 
 				out.flush();
@@ -306,6 +313,7 @@ public class HttpRequestUtils {
 
 		try {
 			response.setRequestTime(System.currentTimeMillis());// 请求开始时间
+
 			try {
 				response.dnsParse();// DNS解析
 
@@ -350,13 +358,13 @@ public class HttpRequestUtils {
 				}
 
 				if (in != null) {
-					response.setBase64Data(Base64.encodeBase64String(IOUtils.inputStreamToByteArray(in)));
+					response.setBodyBytes(IOUtils.toByteArray(in));
 				}
 			} catch (UnknownHostException e) {
-				response.setExceptionName(e.toString());
+				response.setException(e);
 			}
 		} catch (IOException e) {
-			response.setExceptionName(e.toString());
+			response.setException(e);
 		} finally {
 			IOUtils.closeQuietly(in);
 
@@ -368,42 +376,6 @@ public class HttpRequestUtils {
 		}
 
 		return response;
-	}
-
-	/**
-	 * 是否域名
-	 *
-	 * @param url
-	 * @return
-	 */
-	public static boolean isDomain(String url) {
-		String strRegex = "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}$";
-		return Pattern.compile(strRegex, Pattern.CASE_INSENSITIVE).matcher(url).find();
-	}
-
-	/**
-	 * 是否网站
-	 *
-	 * @param url
-	 * @return
-	 */
-	public static boolean isWebSite(String url) {
-		String strRegex = "^((https|http)?://)(([0-9]{1,3}.){3}[0-9]{1,3}|([0-9a-z_!~*'()-]+.)*([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].[a-z]{2,6})(:[0-9]{1,4})?((/?)|(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
-		return Pattern.compile(strRegex, Pattern.CASE_INSENSITIVE).matcher(url).find();
-	}
-
-	/**
-	 * 是否主机
-	 *
-	 * @param url
-	 * @return
-	 */
-	public static boolean isHost(String url) {
-		String strRegexIp     = "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}$";
-		String strRegexDomain = "^(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2}).(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2}).(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2}).(2[0-5]{2}|2[0-4][0-9]|1?[0-9]{1,2})$";
-
-		return Pattern.compile(strRegexIp, Pattern.CASE_INSENSITIVE).matcher(url).find() ||
-				Pattern.compile(strRegexDomain, Pattern.CASE_INSENSITIVE).matcher(url).find();
 	}
 
 }

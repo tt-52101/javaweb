@@ -15,10 +15,6 @@
  */
 package org.javaweb.core.net;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -76,9 +72,14 @@ public abstract class HttpRequest {
 	protected Map<String, String> requestDataMap = new LinkedHashMap<String, String>();
 
 	/**
-	 * 请求的base64编码后的字符串
+	 * 请求内容的二进制
 	 */
-	protected String requestBae64InputStream;
+	protected byte[] requestBytes;
+
+	/**
+	 * 请求内容的流
+	 */
+	protected InputStream requestInputStream;
 
 	/**
 	 * 内容类型
@@ -141,11 +142,7 @@ public abstract class HttpRequest {
 	}
 
 	public HttpRequest data(InputStream in) {
-		try {
-			data(IOUtils.toByteArray(in));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.requestInputStream = in;
 		return this;
 	}
 
@@ -153,17 +150,19 @@ public abstract class HttpRequest {
 		if (requestDataMap != null) {
 			this.requestDataMap.putAll(requestDataMap);
 		}
+
 		return this;
 	}
 
 	public HttpRequest data(byte[] bytes) {
-		this.requestBae64InputStream = Base64.encodeBase64String(bytes);
+		this.requestBytes = bytes;
 		return this;
 	}
 
 	public HttpRequest contentType(String contentType) {
 		this.requestHeader.put("Content-Type", contentType);
 		this.contentType = contentType;
+
 		return this;
 	}
 
@@ -208,8 +207,12 @@ public abstract class HttpRequest {
 		return requestDataMap;
 	}
 
-	public String getRequestBae64InputStream() {
-		return requestBae64InputStream;
+	public byte[] getRequestBytes() {
+		return requestBytes;
+	}
+
+	public InputStream getRequestInputStream() {
+		return requestInputStream;
 	}
 
 	public String getContentType() {

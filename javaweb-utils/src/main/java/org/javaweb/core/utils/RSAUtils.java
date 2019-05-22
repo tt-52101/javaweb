@@ -191,4 +191,59 @@ public class RSAUtils {
 		return signature.verify(Base64.decodeBase64(sign));
 	}
 
+	/**
+	 * 格式化成标准的RSA 公钥Key文件
+	 *
+	 * @param key
+	 * @return
+	 */
+	public static String formatStandardPublicKey(String key) {
+		return formatStandardKey(key, "PUBLIC");
+	}
+
+	/**
+	 * 格式化成标准的RSA Key私钥文件
+	 *
+	 * @param key
+	 * @return
+	 */
+	public static String formatStandardPrivate(String key) {
+		return formatStandardKey(key, "RSA PRIVATE");
+	}
+
+	/**
+	 * 格式化成标准的RSA Key文件
+	 *
+	 * @param key
+	 * @return
+	 */
+	private static String formatStandardKey(String key, String type) {
+		char[]        chars = key.toCharArray();
+		StringBuilder sb    = new StringBuilder("-----BEGIN " + type + " KEY-----");
+
+		for (int i = 0; i < chars.length; i++) {
+			char chr = chars[i];
+
+			if (i % 64 == 0) {
+				sb.append("\n");
+			}
+
+			sb.append(chr);
+		}
+
+		sb.append("\n-----END " + type + " KEY-----");
+
+		return sb.toString();
+	}
+
+	/**
+	 * 标准格式的RSA Key转换成Java格式的Key
+	 *
+	 * @param key
+	 * @return
+	 */
+	public static String formatJavaKey(String key) {
+		return key.replaceAll("\\s*-+.*?-+\\s*", "").replaceAll("\\s+", "");
+	}
+
 }

@@ -11,17 +11,12 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License.64
  */
 package org.javaweb.core.net;
 
-import org.apache.commons.codec.binary.Base64;
 import org.javaweb.core.utils.HttpRequestUtils;
-import org.javaweb.core.utils.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,6 +32,8 @@ public class HttpResponse {
 	 * 远程服务器的响应内容
 	 */
 	protected transient String data;
+
+	private byte[] bodyBytes;
 
 	/**
 	 * 请求的URL地址
@@ -59,11 +56,6 @@ public class HttpResponse {
 	private String contentType;
 
 	/**
-	 * 远程服务器响应内容的base64编码字符串
-	 */
-	private String base64Data;
-
-	/**
 	 * 网站编码类型
 	 */
 	private String charset;
@@ -71,7 +63,7 @@ public class HttpResponse {
 	/**
 	 * 请求处理后发生的异常信息
 	 */
-	private String exceptionName;
+	private Exception exception;
 
 	/**
 	 * 请求开始的时间
@@ -141,6 +133,14 @@ public class HttpResponse {
 		this.url = url;
 	}
 
+	public byte[] getBodyBytes() {
+		return bodyBytes;
+	}
+
+	public void setBodyBytes(byte[] bodyBytes) {
+		this.bodyBytes = bodyBytes;
+	}
+
 	public int getStatusCode() {
 		return statusCode;
 	}
@@ -165,14 +165,6 @@ public class HttpResponse {
 		this.contentType = contentType;
 	}
 
-	public String getBase64Data() {
-		return base64Data;
-	}
-
-	public void setBase64Data(String base64Data) {
-		this.base64Data = base64Data;
-	}
-
 	public String getCharset() {
 		return charset;
 	}
@@ -181,12 +173,12 @@ public class HttpResponse {
 		this.charset = charset;
 	}
 
-	public String getExceptionName() {
-		return exceptionName;
+	public Exception getException() {
+		return exception;
 	}
 
-	public void setExceptionName(String exceptionName) {
-		this.exceptionName = exceptionName;
+	public void setException(Exception exception) {
+		this.exception = exception;
 	}
 
 	public long getRequestTime() {
@@ -260,47 +252,35 @@ public class HttpResponse {
 		this.setCanonicalHostName(ia.getCanonicalHostName());// 别名
 	}
 
-	/**
-	 * 解析HTTP响应正文中的HTML内容为Document树
-	 *
-	 * @return
-	 */
-	public Document parse() {
-		return Jsoup.parse(parseBody(), this.getUrl().toString());
-	}
-
 	protected String parseBody() {
-		return parseBody(null);
+		return parseBody("UTF-8");
 	}
 
 	/**
-	 * 解析HTML为字符串 body 字符串转换可能会有乱码问题,为了避免直接使用解析后的HTML字符串默认隐藏了 HTML
-	 * body,仅提供方便序列化为json的base64字符串作为输出
+	 * 解析响应内容为字符串
 	 *
 	 * @param charset
 	 * @return
 	 */
 	protected String parseBody(String charset) {
-		if (this.data == null && StringUtils.isNotEmpty(this.getBase64Data())) {
+		if (bodyBytes != null) {
 			String htmlCharset = null;
-			byte[] body        = Base64.decodeBase64(this.getBase64Data());
-
-			if (charset != null && Charset.isSupported(charset)) {
-				htmlCharset = charset;
-			} else {
-				htmlCharset = HttpRequestUtils.parseHTMLCharset(body);
-			}
-
-			// 编码验证,如果是GB2312可能会出现乱码需转为GBK
-			if (Charset.isSupported(htmlCharset)) {
-				this.setCharset("GB2312".equalsIgnoreCase(htmlCharset) ? "GBK" : htmlCharset);
-			} else {
-				this.setCharset("UTF-8");
-			}
-
 			try {
-				this.data = new String(body, this.getCharset());
-			} catch (UnsupportedEncodingException e) {
+				if (charset != null && Charset.isSupported(charset)) {
+					htmlCharset = charset;
+				} else {
+					htmlCharset = HttpRequestUtils.parseHTMLCharset(bodyBytes);
+				}
+
+				// 编码验证,如果是GB2312可能会出现乱码需转为GBK
+				if (Charset.isSupported(htmlCharset)) {
+					this.setCharset("GB2312".equalsIgnoreCase(htmlCharset) ? "GBK" : htmlCharset);
+				} else {
+					this.setCharset("UTF-8");
+				}
+
+				this.data = new String(bodyBytes, this.getCharset());
+			} catch (Exception e) {
 				// 忽略
 			}
 		}

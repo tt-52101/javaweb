@@ -1,11 +1,11 @@
 package org.javaweb.jdbc;
 
-import org.javaweb.core.utils.ReflectionUtils;
-import org.javaweb.core.utils.StringUtils;
 import org.javaweb.jdbc.annotation.Column;
 import org.javaweb.jdbc.annotation.Table;
 import org.javaweb.jdbc.exception.IncorrectResultSizeDataAccessException;
 import org.javaweb.jdbc.exception.JDBCIDException;
+import org.javaweb.utils.ReflectionUtils;
+import org.javaweb.utils.StringUtils;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -25,11 +25,11 @@ import java.util.logging.Logger;
  */
 public class JdbcTemplate {
 
+	private static final Logger LOG = Logger.getLogger("info");
+
 	private DataSource dataSource;
 
 	private Connection connection;
-
-	private static final Logger LOG = Logger.getLogger("info");
 
 	public JdbcTemplate(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -37,27 +37,6 @@ public class JdbcTemplate {
 
 	public JdbcTemplate(Connection connection) {
 		this.connection = connection;
-	}
-
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	/**
-	 * 获取数据库链接对象
-	 *
-	 * @return
-	 */
-	public Connection getConnection() {
-		if (connection == null && dataSource != null) {
-			try {
-				return dataSource.getConnection();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return connection;
 	}
 
 	/**
@@ -88,6 +67,27 @@ public class JdbcTemplate {
 			throw new JDBCIDException(table);
 		}
 		return id;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	/**
+	 * 获取数据库链接对象
+	 *
+	 * @return
+	 */
+	public Connection getConnection() {
+		if (connection == null && dataSource != null) {
+			try {
+				return dataSource.getConnection();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return connection;
 	}
 
 	/**

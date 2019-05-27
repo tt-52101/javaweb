@@ -63,6 +63,16 @@ public class Page<T> implements Serializable {
 		this.setRecordCount(recordCount);
 	}
 
+	public static String getPageSql(String sql, int currentPage, int pageSize) {
+		currentPage = currentPage < 1 ? 1 : currentPage;
+		pageSize = pageSize < 1 ? 1 : pageSize;
+		return sql + " limit " + (currentPage - 1) * pageSize + "," + pageSize;
+	}
+
+	public static String getResultCountSql(String sql, Object... obj) {
+		return "SELECT count(*) FROM ( " + sql + " ) rs";
+	}
+
 	public List<T> getResult() {
 		return result;
 	}
@@ -117,16 +127,6 @@ public class Page<T> implements Serializable {
 
 	public void setPageEnd(int pageEnd) {
 		this.pageEnd = pageEnd;
-	}
-
-	public static String getPageSql(String sql, int currentPage, int pageSize) {
-		currentPage = currentPage < 1 ? 1 : currentPage;
-		pageSize = pageSize < 1 ? 1 : pageSize;
-		return sql + " limit " + (currentPage - 1) * pageSize + "," + pageSize;
-	}
-
-	public static String getResultCountSql(String sql, Object... obj) {
-		return "SELECT count(*) FROM ( " + sql + " ) rs";
 	}
 
 }

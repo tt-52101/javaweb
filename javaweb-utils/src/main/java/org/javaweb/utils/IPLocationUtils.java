@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.Arrays;
 
 /**
@@ -47,7 +46,7 @@ public class IPLocationUtils {
 			}
 
 			if (bytes == null && ipFile.exists()) {
-				bytes = Files.readAllBytes(ipFile.toPath());
+				bytes = FileUtils.readFileToByteArray(ipFile);
 			}
 
 			fileSize = bytes.length;

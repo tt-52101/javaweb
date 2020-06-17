@@ -21,7 +21,6 @@ import org.apache.commons.codec.binary.Base64;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 public class HttpServletResponseUtils {
 
@@ -42,11 +41,15 @@ public class HttpServletResponseUtils {
 	}
 
 	public static void responseRc4Json(HttpServletResponse response, Object obj, String RC4Key) {
-		response(response, "application/json;charset=UTF-8",
-				new String(Base64.encodeBase64(
-						EncryptUtils.encryptionRC4Byte(JSON.toJSONString(obj), RC4Key)
-				), StandardCharsets.UTF_8)
-		);
+		try {
+			response(response, "application/json;charset=UTF-8",
+					new String(Base64.encodeBase64(
+							EncryptUtils.encryptionRC4Byte(JSON.toJSONString(obj), RC4Key)
+					), "UTF-8")
+			);
+		} catch (UnsupportedEncodingException e) {
+			// ignore
+		}
 	}
 
 	public static void responseHTML(HttpServletResponse response, String text) {

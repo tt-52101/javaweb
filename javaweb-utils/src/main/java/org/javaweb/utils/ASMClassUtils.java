@@ -17,7 +17,6 @@ package org.javaweb.utils;
 
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.AnnotationNode;
-import org.springframework.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

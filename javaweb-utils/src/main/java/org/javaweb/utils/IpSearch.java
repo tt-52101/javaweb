@@ -2,7 +2,6 @@ package org.javaweb.utils;
 
 import java.io.File;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.Arrays;
 
 /**
@@ -32,7 +31,7 @@ public class IpSearch {
 			}
 
 			if (data == null && ipFile.exists()) {
-				data = Files.readAllBytes(ipFile.toPath());
+				data = FileUtils.readFileToByteArray(ipFile);
 			}
 
 			for (int i = 0; i < 256; i++) {

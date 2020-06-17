@@ -146,7 +146,6 @@ public class HttpRequestUtils {
 		HttpURLConnection.setFollowRedirects(request.isFollowRedirects());
 
 		if (StringUtils.isNotEmpty(request.getMethod()) && !(request instanceof MultipartRequest)) {
-
 			// 非GET请求设置DoInput、DoOutput
 			if (!"GET".equalsIgnoreCase(request.getMethod())) {
 				httpURLConnection.setDoInput(true);
@@ -301,7 +300,7 @@ public class HttpRequestUtils {
 	}
 
 	/**
-	 * 发送HTTP请求,发送HTTP请求前先解析一次DNS记录,如果解析正常继续请求
+	 * 发送HTTP请求
 	 *
 	 * @param request
 	 * @return
@@ -315,8 +314,6 @@ public class HttpRequestUtils {
 			response.setRequestTime(System.currentTimeMillis());// 请求开始时间
 
 			try {
-				response.dnsParse();// DNS解析
-
 				String protocol = request.getUrl().getProtocol();// 获取请求协议
 
 				if (!protocol.equals("http") && !protocol.equals("https")) {
@@ -345,6 +342,19 @@ public class HttpRequestUtils {
 				setRequestData(httpURLConnection, request, data);// 设置请求参数
 
 				httpURLConnection.connect();
+
+				// 处理30X不同协议HttpURLConnection不自定跳转问题
+				if (request.isFollowRedirects() && request.getMaxRedirect() < 5) {
+					String location = httpURLConnection.getHeaderField("Location");
+
+					if (StringUtils.isNotEmpty(location) && location.toLowerCase().startsWith("http")) {
+						URL redirectURL = new URL(location);
+
+						if (!protocol.equals(redirectURL.getProtocol())) {
+							return httpRequest(new HttpURLRequest(redirectURL, request.getMaxRedirect() + 1));
+						}
+					}
+				}
 
 				response.setRequest(request);
 

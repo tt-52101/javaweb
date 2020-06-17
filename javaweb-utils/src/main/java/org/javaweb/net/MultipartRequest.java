@@ -239,8 +239,6 @@ public class MultipartRequest extends HttpRequest {
 		try {
 			response.setRequestTime(System.currentTimeMillis());// 请求开始时间
 			try {
-				response.dnsParse();// DNS解析
-
 				// 初始化HttpURLConnection
 				httpURLConnection = (HttpURLConnection) url.openConnection();
 				httpURLConnection.setUseCaches(false);

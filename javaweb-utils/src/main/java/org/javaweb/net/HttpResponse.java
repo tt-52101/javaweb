@@ -17,10 +17,8 @@ package org.javaweb.net;
 
 import org.javaweb.utils.HttpRequestUtils;
 
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,21 +77,6 @@ public class HttpResponse {
 	 * 请求的远程服务器文件的最后修改时间
 	 */
 	private long lastModified;
-
-	/**
-	 * 远程服务器的IP地址
-	 */
-	private String ip;
-
-	/**
-	 * 远程服务器主机名
-	 */
-	private String hostName;
-
-	/**
-	 * 远程服务器别名
-	 */
-	private String canonicalHostName;
 
 	/**
 	 * 远程服务器的域名地址
@@ -205,30 +188,6 @@ public class HttpResponse {
 		this.lastModified = lastModified;
 	}
 
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-
-	public String getHostName() {
-		return hostName;
-	}
-
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
-	}
-
-	public String getCanonicalHostName() {
-		return canonicalHostName;
-	}
-
-	public void setCanonicalHostName(String canonicalHostName) {
-		this.canonicalHostName = canonicalHostName;
-	}
-
 	public String getDomain() {
 		return domain;
 	}
@@ -245,13 +204,6 @@ public class HttpResponse {
 		this.header = header;
 	}
 
-	public void dnsParse() throws UnknownHostException {
-		InetAddress ia = InetAddress.getByName(this.domain);
-		this.setIp(ia.getHostAddress());// ip地址
-		this.setHostName(ia.getHostAddress());// 主机名
-		this.setCanonicalHostName(ia.getCanonicalHostName());// 别名
-	}
-
 	protected String parseBody() {
 		return parseBody("UTF-8");
 	}
@@ -265,6 +217,7 @@ public class HttpResponse {
 	protected String parseBody(String charset) {
 		if (bodyBytes != null) {
 			String htmlCharset = null;
+
 			try {
 				if (charset != null && Charset.isSupported(charset)) {
 					htmlCharset = charset;

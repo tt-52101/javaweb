@@ -24,6 +24,8 @@ import java.util.Map;
 
 public class HttpURLRequest extends HttpRequest {
 
+	private int maxRedirect = 0;
+
 	/**
 	 * 最大的body限制
 	 */
@@ -40,6 +42,11 @@ public class HttpURLRequest extends HttpRequest {
 
 	public HttpURLRequest(URL url) {
 		this.url = url;
+	}
+
+	public HttpURLRequest(URL url, int maxRedirect) {
+		this.url = url;
+		this.maxRedirect = maxRedirect;
 	}
 
 	public HttpURLRequest(String url) throws MalformedURLException {
@@ -162,6 +169,10 @@ public class HttpURLRequest extends HttpRequest {
 	@Override
 	public HttpResponse request() {
 		return HttpRequestUtils.httpRequest(this);
+	}
+
+	public int getMaxRedirect() {
+		return maxRedirect;
 	}
 
 }

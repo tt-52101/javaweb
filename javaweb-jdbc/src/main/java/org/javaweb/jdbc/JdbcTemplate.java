@@ -18,14 +18,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Created by yz on 2017/7/4.
  */
 public class JdbcTemplate {
-
-	private static final Logger LOG = Logger.getLogger("info");
 
 	private DataSource dataSource;
 
@@ -91,6 +88,20 @@ public class JdbcTemplate {
 	}
 
 	/**
+	 * 更新查询
+	 *
+	 * @param sql
+	 * @param args
+	 * @return
+	 * @throws SQLException
+	 */
+	public int update(String sql, Object... args) throws SQLException {
+		return SqlHelp.executeUpdate(
+				this.getConnection(), sql, args
+		);
+	}
+
+	/**
 	 * 映射数据库表实现更新实体类即可更新对应的表，需要先查询出对应的column信息后update
 	 *
 	 * @param <T>
@@ -118,7 +129,7 @@ public class JdbcTemplate {
 				Object       idValue = methodMap.get("get" + table.id()).invoke(obj);
 				List<Object> ls      = new ArrayList<Object>();
 
-				if (StringUtils.isNotEmpty(idValue)) {
+				if (!StringUtils.isNotEmpty(idValue)) {
 					throw new JDBCIDException("JDBC字段映射异常,数据表[" + table + "]ID值不能为空.");
 				}
 
@@ -128,7 +139,9 @@ public class JdbcTemplate {
 				for (String str : fieldMap.keySet()) {
 					String field = str.toLowerCase();
 
-					if (!table.id().equals(field) && methodMap.containsKey("set" + field) && methodMap.containsKey("get" + field)) {
+					if (!table.id().equals(field) &&
+							methodMap.containsKey("set" + field) && methodMap.containsKey("get" + field)) {
+
 						Method  method     = methodMap.get("set" + str);
 						String  columnName = field;
 						boolean updatable  = true;
@@ -205,7 +218,7 @@ public class JdbcTemplate {
 								try {
 									method.invoke(c, objValue);
 								} catch (IllegalArgumentException e) {
-									LOG.info("方法:" + method + ",值:" + objValue + ",映射异常:" + e);
+									throw new SQLException("方法:" + method + ",值:" + objValue + ",映射异常:" + e);
 								}
 							}
 						}
@@ -258,13 +271,8 @@ public class JdbcTemplate {
 	 * @param arr
 	 * @return
 	 */
-	public <T> List<T> queryForList(String sql, Class<T> entityClass, Object... arr) {
-		try {
-			return tableMapping(sql, entityClass, arr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	public <T> List<T> queryForList(String sql, Class<T> entityClass, Object... arr) throws SQLException {
+		return tableMapping(sql, entityClass, arr);
 	}
 
 	public int queryForInteger(String sql, Object... objs) throws SQLException {
@@ -299,21 +307,16 @@ public class JdbcTemplate {
 	 * @return
 	 */
 	public <T> Page<T> queryForPage(String sql, Class<T> entityClass,
-	                                int pageNum, int pageSize, Object... objs) {
-		try {
-			int recordCount = queryForInteger(Page.getResultCountSql(sql), objs);
-			List<T> ls = tableMapping(
-					Page.getPageSql(sql, pageNum, pageSize),
-					entityClass,
-					objs
-			);
+	                                int pageNum, int pageSize, Object... objs) throws SQLException {
 
-			return new Page<T>(pageNum, pageSize, ls, recordCount);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		int recordCount = queryForInteger(Page.getResultCountSql(sql), objs);
+		List<T> ls = tableMapping(
+				Page.getPageSql(sql, pageNum, pageSize),
+				entityClass,
+				objs
+		);
 
-		return null;
+		return new Page<T>(pageNum, pageSize, ls, recordCount);
 	}
 
 }

@@ -54,7 +54,8 @@ public class DomainUtils {
 	public static boolean isValidDomainName(String domainName) {
 		domainName = domainName.toLowerCase();
 		String domainNameAscii = IDN.toASCII(domainName);
-		String suffix          = domainName.contains(".") ? domainNameAscii.substring(domainNameAscii.lastIndexOf(".") + 1) : "";
+		String suffix          = domainName.contains(".") ?
+				domainNameAscii.substring(domainNameAscii.lastIndexOf(".") + 1) : "";
 
 		return DIMAIN_PATTERN.matcher(domainNameAscii).find()
 				&& (COUNTRY_LIST.contains(suffix) || GENERIC_LIST.contains(suffix));
@@ -88,29 +89,6 @@ public class DomainUtils {
 	 */
 	public static String toAscii(String domain) {
 		return IDN.toASCII(domain.toLowerCase());
-	}
-
-	public static void main(String[] args) {
-		try {
-			BufferedReader br  = new BufferedReader(new InputStreamReader(new FileInputStream("/Users/yz/Downloads/domain.txt")));
-			BufferedWriter bw  = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/yz/Downloads/domains.txt", true)));
-			String         str = null;
-
-			while ((str = br.readLine()) != null) {
-				try {
-					if (isValidDomainName(str)) {
-						bw.write(str + "\r\n");
-						bw.flush();
-					}
-				} catch (Exception e) {
-					System.err.println(str);
-				}
-			}
-
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

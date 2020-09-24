@@ -71,7 +71,7 @@ public class DateUtils {
 	 *
 	 * @return
 	 */
-	public static Date getEndDayOfYesterDay() {
+	public static Date getEndDayOfYesterday() {
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(getDayEnd());
 		cal.add(Calendar.DAY_OF_MONTH, -1);

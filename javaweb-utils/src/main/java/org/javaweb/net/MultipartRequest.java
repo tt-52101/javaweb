@@ -53,7 +53,7 @@ public class MultipartRequest extends HttpRequest {
 		String protocol = this.url.getProtocol();// 获取请求协议
 
 		if (!protocol.equals("http") && !protocol.equals("https")) {
-			throw new MalformedURLException("只支持 http & https 请求协议.");
+			throw new MalformedURLException("Protocol ERROR!");
 		} else if ("https".equalsIgnoreCase(protocol)) {
 			SslUtils.ignoreSsl();
 		}

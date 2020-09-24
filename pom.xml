@@ -7,7 +7,7 @@
 	<groupId>org.javaweb</groupId>
 	<artifactId>javaweb</artifactId>
 	<packaging>pom</packaging>
-	<version>2.0.1</version>
+	<version>2.0.3</version>
 	<url>https://github.com/javasec/javaweb</url>
 	<name>javaweb</name>
 
@@ -18,7 +18,9 @@
 	<properties>
 		<gpg.skip>true</gpg.skip>
 		<javadoc.skip>true</javadoc.skip>
-		<jdk.version>1.6</jdk.version>
+		<jdk.version>6</jdk.version>
+		<maven.compiler.source>6</maven.compiler.source>
+		<maven.compiler.target>6</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -77,7 +79,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
+				<version>2.5.1</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<source>${jdk.version}</source>

@@ -40,9 +40,13 @@ public class HexUtils extends Hex {
 	 * @return String
 	 */
 	public static String bytes2HexString(byte[] bytes) {
+		return bytes2HexString(bytes, 0, bytes.length);
+	}
+
+	public static String bytes2HexString(byte[] bytes, int srcPos, int endPos) {
 		StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < bytes.length; i++) {
+		for (int i = srcPos; i < endPos; i++) {
 			String hex = Integer.toHexString(bytes[i] & 0xFF);
 			sb.append(hex.length() == 1 ? '0' + hex : hex.toUpperCase());
 		}

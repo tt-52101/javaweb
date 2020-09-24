@@ -36,7 +36,9 @@ public class FreemarkerUtils {
 	 * @param clazz
 	 * @return
 	 */
-	public static Map<String, TemplateModel> classToTemplateModelMap(Object clazz, Map<String, TemplateModel> paramsMap) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, TemplateModelException {
+	public static Map<String, TemplateModel> classToTemplateModelMap(Object clazz, Map<String, TemplateModel> paramsMap)
+			throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, TemplateModelException {
+
 		PropertyUtilsBean    propertyUtilsBean = new PropertyUtilsBean();
 		PropertyDescriptor[] descriptors       = propertyUtilsBean.getPropertyDescriptors(clazz);
 

@@ -21,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -139,7 +140,10 @@ public class HttpServletRequestUtils {
 	 */
 	public static String getAsciiEncoding(String str, String key) {
 		for (String s : key.split(",")) {
-			str = str.replaceAll("(?i)(" + s + ")", s.replace("" + s.charAt(0), "&#" + (int) s.charAt(0) + ";"));
+			str = str.replaceAll(
+					"(?i)(" + s + ")",
+					s.replace("" + s.charAt(0), "&#" + (int) s.charAt(0) + ";")
+			);
 		}
 
 		return str;
@@ -177,8 +181,8 @@ public class HttpServletRequestUtils {
 			char[]        arr = content.toCharArray();
 			StringBuilder sb  = new StringBuilder();
 
-			for (int i = 0; i < arr.length; i++) {
-				switch (arr[i]) {
+			for (char c : arr) {
+				switch (c) {
 					case '&':
 						sb.append("&amp;");
 						break;
@@ -195,7 +199,7 @@ public class HttpServletRequestUtils {
 						sb.append("&gt;");
 						break;
 					default:
-						sb.append(arr[i]);
+						sb.append(c);
 						break;
 				}
 			}
@@ -203,7 +207,7 @@ public class HttpServletRequestUtils {
 			return sb.toString();
 		}
 
-		return content;
+		return null;
 	}
 
 	/**
@@ -217,8 +221,8 @@ public class HttpServletRequestUtils {
 			char[]        arr = queryString.toCharArray();
 			StringBuilder sb  = new StringBuilder();
 
-			for (int i = 0; i < arr.length; i++) {
-				switch (arr[i]) {
+			for (char c : arr) {
+				switch (c) {
 					case '"':
 						sb.append("&quot;");
 						break;
@@ -232,7 +236,7 @@ public class HttpServletRequestUtils {
 						sb.append("&gt;");
 						break;
 					default:
-						sb.append(arr[i]);
+						sb.append(c);
 						break;
 				}
 			}
@@ -334,7 +338,9 @@ public class HttpServletRequestUtils {
 			// 文件后缀验证
 			String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
 
-			return !Pattern.compile("asp|asa|cer|jsp|php", Pattern.CASE_INSENSITIVE | Pattern.DOTALL).matcher(fileExt).find();
+			return !Pattern.compile(
+					"asp|asa|cer|jsp|php", Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+			).matcher(fileExt).find();
 		}
 
 		return true;
@@ -361,8 +367,9 @@ public class HttpServletRequestUtils {
 		MultipartFile multipart = new MultipartFile();
 
 		if (anySuffixFile || isAllowedFileName(docFile)) {
+			ServletContext context 	= request.getSession().getServletContext();
 			String dateDirName = new SimpleDateFormat("yyyyMMdd").format(new Date());
-			String savePath    = request.getSession().getServletContext().getRealPath("/") + "uploads/files/" + dateDirName + "/";
+			String savePath    = context.getRealPath("/") + "uploads/files/" + dateDirName + "/";
 			String saveUrl     = request.getContextPath() + "/uploads/files/" + dateDirName + "/";
 			String fileName    = docFile.getOriginalFilename();
 			String fileExt     = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();

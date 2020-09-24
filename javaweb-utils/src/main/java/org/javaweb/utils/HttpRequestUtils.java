@@ -35,9 +35,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.javaweb.utils.StringUtils.isNotEmpty;
+
 public class HttpRequestUtils {
 
-	private static final Pattern HTML_CHARSET_PATTERN = Pattern.compile("(?i)<meta.*\\bcharset\\s*=\\s*(?:\"|')?([^\\s,;\"']*)");
+	private static final Pattern HTML_CHARSET_PATTERN =
+			Pattern.compile("(?i)<meta.*\\bcharset\\s*=\\s*(?:\"|')?([^\\s,;\"']*)");
 
 	/**
 	 * 获取HTTP请求的文件类型,截取URI后缀部分
@@ -67,12 +70,14 @@ public class HttpRequestUtils {
 
 			for (String a : args.keySet()) {
 				try {
+					String value = args.get(a);
+
 					if (i > 0) {
 						sb.append("&");
 					}
 
 					i++;
-					sb.append(a).append("=").append(URLEncoder.encode(args.get(a), encoding));
+					sb.append(a).append("=").append(value != null ? URLEncoder.encode(value, encoding):"");
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 				}
@@ -136,61 +141,63 @@ public class HttpRequestUtils {
 	/**
 	 * 设置HTTP请求基本属性 设置HTTP读写超时时间、是否跳转跟随、User-Agent、Referer
 	 *
-	 * @param httpURLConnection
+	 * @param connection
 	 * @param request
 	 * @throws IOException
 	 */
-	public static void setRequestProperties(HttpURLConnection httpURLConnection, HttpRequest request) throws IOException {
-		httpURLConnection.setConnectTimeout(request.getTimeout());
-		httpURLConnection.setReadTimeout(request.getTimeout());
+	public static void setRequestProperties(HttpURLConnection connection, HttpRequest request) throws IOException {
+		connection.setConnectTimeout(request.getTimeout());
+		connection.setReadTimeout(request.getTimeout());
 		HttpURLConnection.setFollowRedirects(request.isFollowRedirects());
 
-		if (StringUtils.isNotEmpty(request.getMethod()) && !(request instanceof MultipartRequest)) {
+		if (isNotEmpty(request.getMethod()) && !(request instanceof MultipartRequest)) {
 			// 非GET请求设置DoInput、DoOutput
 			if (!"GET".equalsIgnoreCase(request.getMethod())) {
-				httpURLConnection.setDoInput(true);
-				httpURLConnection.setDoOutput(true);
+				connection.setDoInput(true);
+				connection.setDoOutput(true);
 			}
 
-			httpURLConnection.setRequestMethod(request.getMethod().toUpperCase());
+			connection.setRequestMethod(request.getMethod().toUpperCase());
 		}
 
 		// 设置Cookie
-		if (StringUtils.isNotEmpty(request.getCookie())) {
-			httpURLConnection.setRequestProperty("Cookie", request.getCookie());
+		if (isNotEmpty(request.getCookie())) {
+			connection.setRequestProperty("Cookie", request.getCookie());
 		}
 
 		// 设置User-Agent
-		if (StringUtils.isNotEmpty(request.getUserAgent())) {
-			httpURLConnection.setRequestProperty("User-Agent", request.getUserAgent());
+		if (isNotEmpty(request.getUserAgent())) {
+			connection.setRequestProperty("User-Agent", request.getUserAgent());
 		}
 
 		// 设置Referer
-		if (StringUtils.isNotEmpty(request.getReferer())) {
-			httpURLConnection.setRequestProperty("Referer", request.getReferer());
+		if (isNotEmpty(request.getReferer())) {
+			connection.setRequestProperty("Referer", request.getReferer());
 		}
 	}
 
 	/**
 	 * 设置Http请求数据
 	 *
-	 * @param httpURLConnection
+	 * @param connection
 	 * @param request
 	 * @param data
 	 * @throws IOException
 	 */
-	public static void setRequestData(HttpURLConnection httpURLConnection, HttpURLRequest request, String data) throws IOException {
+	public static void setRequestData(HttpURLConnection connection,
+									  HttpURLRequest request, String data) throws IOException {
+
 		// 设置HTTP请求头
 		Map<String, String> headers = request.getRequestHeader();
 
 		for (String key : headers.keySet()) {
-			httpURLConnection.setRequestProperty(key, headers.get(key));
+			connection.setRequestProperty(key, headers.get(key));
 		}
 
 		// 设置HTTP非GET请求参数
-		if (StringUtils.isNotEmpty(request.getMethod()) && !"GET".equalsIgnoreCase(request.getMethod())) {
+		if (isNotEmpty(request.getMethod()) && !"GET".equalsIgnoreCase(request.getMethod())) {
 			if (data != null || request.getRequestBytes() != null || request.getRequestInputStream() != null) {
-				OutputStream out = httpURLConnection.getOutputStream();
+				OutputStream out = connection.getOutputStream();
 
 				// 输出请求数据,优先级:byte[]->InputStream->String
 				if (request.getRequestBytes() != null) {
@@ -239,7 +246,7 @@ public class HttpRequestUtils {
 	private static void setCookies(HttpResponse response) {
 		String cookieString = response.getRequest().getCookie();
 
-		if (StringUtils.isNotEmpty(cookieString)) {
+		if (isNotEmpty(cookieString)) {
 			// 记录原始的Cookie值字符串到响应的Cookie中，并生成Cookie Map
 			String[]            cookies   = cookieString.split(";\\s?");
 			Map<String, String> cookieMap = new LinkedHashMap<String, String>();
@@ -296,7 +303,6 @@ public class HttpRequestUtils {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -317,7 +323,7 @@ public class HttpRequestUtils {
 				String protocol = request.getUrl().getProtocol();// 获取请求协议
 
 				if (!protocol.equals("http") && !protocol.equals("https")) {
-					throw new MalformedURLException("只支持 http & https 请求协议.");
+					throw new MalformedURLException("Protocol ERROR!");
 				} else if ("https".equalsIgnoreCase(protocol)) {
 					SslUtils.ignoreSsl();
 				}
@@ -332,14 +338,17 @@ public class HttpRequestUtils {
 
 				URL url = request.getUrl();
 
-				if ("GET".equalsIgnoreCase(request.getMethod()) && StringUtils.isNotEmpty(data)) {
-					url = new URL(request.getUrl() + (StringUtils.isNotEmpty(request.getUrl().getQuery()) ? "&" : "?") + data);
+				if ("GET".equalsIgnoreCase(request.getMethod()) && isNotEmpty(data)) {
+					url = new URL(request.getUrl() + (isNotEmpty(request.getUrl().getQuery()) ? "&" : "?") + data);
 				}
 
 				httpURLConnection = (HttpURLConnection) url.openConnection();
 
-				setRequestProperties(httpURLConnection, request);// 设置请求信息
-				setRequestData(httpURLConnection, request, data);// 设置请求参数
+				// 设置请求信息
+				setRequestProperties(httpURLConnection, request);
+
+				// 设置请求参数
+				setRequestData(httpURLConnection, request, data);
 
 				httpURLConnection.connect();
 
@@ -347,7 +356,7 @@ public class HttpRequestUtils {
 				if (request.isFollowRedirects() && request.getMaxRedirect() < 5) {
 					String location = httpURLConnection.getHeaderField("Location");
 
-					if (StringUtils.isNotEmpty(location) && location.toLowerCase().startsWith("http")) {
+					if (isNotEmpty(location) && location.toLowerCase().startsWith("http")) {
 						URL redirectURL = new URL(location);
 
 						if (!protocol.equals(redirectURL.getProtocol())) {
@@ -358,7 +367,8 @@ public class HttpRequestUtils {
 
 				response.setRequest(request);
 
-				setResponse(httpURLConnection, response);// 设置HTTP响应信息
+				// 设置HTTP响应信息
+				setResponse(httpURLConnection, response);
 
 				// 获取HTTP请求响应内容
 				try {
@@ -382,7 +392,8 @@ public class HttpRequestUtils {
 				httpURLConnection.disconnect();
 			}
 
-			response.setResponseTime(System.currentTimeMillis());// 请求结束时间
+			// 请求结束时间
+			response.setResponseTime(System.currentTimeMillis());
 		}
 
 		return response;
